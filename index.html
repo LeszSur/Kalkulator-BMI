@@ -52,7 +52,8 @@
     <script type="text/javascript" src="gauge.js"></script>
     <script type="text/javascript">
 
-        google.charts.load('current', {'packages':['gauge']});
+        //google.charts.load('current', {'packages':['gauge']});
+        google.charts.load('current', {'packages':['gauge'], 'language': 'pl'});
         google.charts.setOnLoadCallback(ustaw_zegar);
       
         let liczba_1 = document.getElementById('wzrost');
@@ -81,8 +82,10 @@
         window.onload = zaladuj_dane();
 
             function wylicz_wynik(){
-                let PierwszaLiczba = parseInt(liczba_1.value);
-                let DrugaLiczba = parseInt(liczba_2.value);
+                let Pierwsza = parseFloat((liczba_1.value).replace(',', '.'));
+                let Druga = parseFloat((liczba_2.value).replace(',', '.'));
+                let PierwszaLiczba = Math.round(Pierwsza);
+                let DrugaLiczba = Math.round(Druga);
                 let BMI = 0;
                     if ((isNaN(PierwszaLiczba) == true) || (isNaN(DrugaLiczba) == true)) {
                         document.getElementById("komunikat_1").innerHTML = "podaj poprawne dane!";
@@ -137,8 +140,8 @@
                 gaugeData.setValue(0, 0, BMI);
                 gauge.draw(gaugeData, gaugeOptions);
                 document.getElementById("komunikat_1").innerHTML = "Wzrost: " + wzrost + "cm Waga: " + waga + "kg";
-                document.getElementById("komunikat_2").innerHTML = "BMI " + BMI;
-                document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + srednia();
+                document.getElementById("komunikat_2").innerHTML = "BMI " + formatuj_liczbe(BMI);
+                document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + formatuj_liczbe(srednia());
                 document.getElementById("komunikat_2").style.color = 'rgb(255, 255, 170)';
 
                     if (BMI <18.5) {
@@ -166,7 +169,7 @@
                 let nowyWpisArchiwum = document.createElement("div");
                 nowyWpisArchiwum.name = wyniki.length;
                 nowyWpisArchiwum.addEventListener("click", click, false);
-                nowyWpisArchiwum.innerHTML = nowy_tekst +" "+nowy_wzrost+"-"+nowa_waga+" "+ nowe_BMI;
+                nowyWpisArchiwum.innerHTML = nowy_tekst +" "+nowy_wzrost+"-"+nowa_waga+" "+ formatuj_liczbe(nowe_BMI);
                 document.querySelector(".wpisyWynikow").appendChild(nowyWpisArchiwum);
             };
 
@@ -222,6 +225,15 @@
                     gauge.draw(gaugeData, gaugeOptions);
             };
 
+            function formatuj_liczbe(liczba){
+                let liczba_sformatowana = (parseFloat(liczba)).toLocaleString('pl-PL',{ 
+                    useGrouping:'true',
+                    minimumFractionDigits: (0),
+                    maximumFractionDigits: (2),
+                });
+            return liczba_sformatowana;
+            };
+
             function zaladuj_dane() {
                 let get_storage_data = localStorage.getItem("data");
                 let get_storage_wzrost = localStorage.getItem("wzrost");
@@ -240,7 +252,7 @@
                         wpisArchiwum((wyniki[wyniki.length - 1][0]), (wyniki[wyniki.length - 1][1]), 
                                         (wyniki[wyniki.length - 1][2]),(wyniki[wyniki.length - 1][3]));
                     }
-                    document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + srednia();
+                    document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + formatuj_liczbe(srednia());
                 }
             };
 
