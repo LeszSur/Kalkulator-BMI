@@ -81,10 +81,8 @@
         window.onload = zaladuj_dane();
 
             function wylicz_wynik(){
-                let Pierwsza = parseFloat((liczba_1.value).replace(',', '.'));
-                let Druga = parseFloat((liczba_2.value).replace(',', '.'));
-                let PierwszaLiczba = Math.round(Pierwsza);
-                let DrugaLiczba = Math.round(Druga);
+                let PierwszaLiczba = parseFloat((liczba_1.value).replace(',', '.'));
+                let DrugaLiczba = parseFloat((liczba_2.value).replace(',', '.'));
                 let BMI = 0;
                     if ((isNaN(PierwszaLiczba) == true) || (isNaN(DrugaLiczba) == true)) {
                         document.getElementById("komunikat_1").innerHTML = "podaj poprawne dane!";
@@ -106,7 +104,7 @@
                         const data = new Date();
                         wyniki.push(["Pomiar#" + (wyniki.length + 1) + " z " + data.getFullYear() + "." 
                             + (data.getMonth() + 1) + "." + data.getDate() + "-" + data.getHours() + ":" 
-                            + data.getMinutes() + ":" + data.getSeconds(), PierwszaLiczba, DrugaLiczba, parseFloat(BMI)]);
+                            + data.getMinutes() + ":" + data.getSeconds(), Math.round(PierwszaLiczba), Math.round(DrugaLiczba), BMI]);
         
                         let storage_data = [];
                         let storage_wzrost = [];        
