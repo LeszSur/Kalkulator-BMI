@@ -17,10 +17,10 @@
             <div id="ramka">
             <p><strong>Podaj swoje parametry</strong></p>
             <p>wzrost:</p>
-            <p><input type="text" id="wzrost"></p>
+            <p><input class="wzrost"/></p>
             <p>waga: </p>
-            <p><input type="text" id="waga"></p>
-            <p><input type="submit" value="Zatwierdź" onclick="wylicz_wynik()"></p>
+            <p><input class="waga"/></p>
+            <button class="wyliczWynik">Zatwierdź</button>
             </div>
             <div id=ramka-jpg>
             <img src="pict.jpg" width="280px" height= "280px" style="border-radius: 15px;">
@@ -29,10 +29,10 @@
         
         <div id="panel-wyniki">
             <div id = "chart_div"></div>
-            <p id="komunikat_1"></p>
-            <p id="komunikat_2"></p>
-            <p id="stan"></p>
-            <p id="komunikat_3"></p>
+            <p class="komunikat_1"></p>
+            <p class="komunikat_2"></p>
+            <p class="stan"></p>
+            <p class="komunikat_3"></p>
         </div>
         
         <div id="panel-boczny"> 
@@ -41,10 +41,10 @@
                 <div class="wpisyWynikow"></div>
             </div>
             <div id="ramka">
-                <p id="srednia">Średnia wszystkich wyników:</p>
+                <p class="srednia">Średnia wszystkich wyników:</p>
             </div>
             <div id="ramka">
-                <p><input type="submit" value="Usuń wszystkie wyniki z archiwum" onclick="wyczysc_wyniki()"></p>
+                <button class="usunWyniki">Usuń wszystkie wyniki z archiwum</button>
             </div>
           </div>
         </section>
@@ -53,10 +53,18 @@
     <script type="text/javascript">
 
         google.charts.load('current', {'packages':['gauge'], 'language': 'pl'});
-        google.charts.setOnLoadCallback(ustaw_zegar);
+        google.charts.setOnLoadCallback(function (){
+            gaugeData = new google.visualization.DataTable();
+            gaugeData = new google.visualization.DataTable();
+            gaugeData.addColumn('number', 'BMI');
+            gaugeData.addRows(2);
+            gaugeData.setCell(0, 0, 0);
+            gauge = new google.visualization.Gauge(document.getElementById('chart_div'));
+            gauge.draw(gaugeData, gaugeOptions);
+        });
       
-        let liczba_1 = document.getElementById('wzrost');
-        let liczba_2 = document.getElementById('waga');
+        let liczba_1 = document.querySelector('.wzrost');
+        let liczba_2 = document.querySelector('.waga');
         let wyniki = [];
       
         let gaugeOptions = {
@@ -72,29 +80,22 @@
 
         let gauge;
 
-        let click = function (wybor){
-            let moj_wybor = wybor.target.name; 
-            wyswietl_wynik(moj_wybor);
-            document.getElementById("komunikat_3").innerHTML = "Pomiar#" + moj_wybor + " z archiwum";
-        };
-
-        window.onload = zaladuj_dane();
-
-            function wylicz_wynik(){
+        let wyliczWynik = document.querySelector(".wyliczWynik");
+            wyliczWynik.addEventListener("click", function () {
                 let PierwszaLiczba = parseFloat((liczba_1.value).replace(',', '.'));
                 let DrugaLiczba = parseFloat((liczba_2.value).replace(',', '.'));
                 let BMI = 0;
                     if ((isNaN(PierwszaLiczba) == true) || (isNaN(DrugaLiczba) == true)) {
-                        document.getElementById("komunikat_1").innerHTML = "podaj poprawne dane!";
-                        zeruj_ustawienia();
+                        document.querySelector(".komunikat_1").innerHTML = "podaj poprawne dane!";
+                        zerujUstawienia();
                     }
                     else if ((PierwszaLiczba < 120) || (PierwszaLiczba >240)) {
-                        document.getElementById("komunikat_1").innerHTML = "wzrost nie jest poprawny!";
-                        zeruj_ustawienia();
+                        document.querySelector(".komunikat_1").innerHTML = "wzrost nie jest poprawny!";
+                        zerujUstawienia();
                     }   
                     else if ((DrugaLiczba < 40) || (DrugaLiczba >200)) {
-                        document.getElementById("komunikat_1").innerHTML = "waga nie jest poprawna!";
-                        zeruj_ustawienia();
+                        document.querySelector(".komunikat_1").innerHTML = "waga nie jest poprawna!";
+                        zerujUstawienia();
                     }
                     else {
                         BMI = (DrugaLiczba / ((PierwszaLiczba/100) * (PierwszaLiczba/100))).toFixed(2);
@@ -125,48 +126,72 @@
                         wpisArchiwum((wyniki[wyniki.length - 1][0]), (wyniki[wyniki.length - 1][1]), 
                                         (wyniki[wyniki.length - 1][2]),(wyniki[wyniki.length - 1][3]));
                         
-                        wyswietl_wynik(wyniki.length);
+                        wyswietlWynik(wyniki.length);
                     };    
-            }; 
+            });
 
-            function wyswietl_wynik(parametr){
+            let click = function (wybor){
+            let mojWybor = wybor.target.name; 
+            wyswietlWynik(mojWybor);
+            document.querySelector(".komunikat_3").innerHTML = "Pomiar#" + mojWybor + " z archiwum";
+            };
+
+            let usunWyniki = document.querySelector(".usunWyniki");
+            usunWyniki.addEventListener("click", function() {
+                let div = document.querySelector(".wpisyWynikow"), child;
+                while ((child = div.firstChild)) {
+                div.removeChild(child);
+                };
+                document.querySelector(".komunikat_1").innerHTML = "";
+                document.querySelector(".komunikat_2").innerHTML = "";
+                document.querySelector(".stan").innerHTML = "";
+                document.querySelector(".komunikat_3").innerHTML = "";
+                gaugeData.setValue(0, 0, 0);
+                gauge.draw(gaugeData, gaugeOptions);
+                document.querySelector('.srednia').innerHTML = "Średnia wszystkich wyników:";
+                wyniki.length = 0;
+                localStorage.clear();
+            });
+
+            function wyswietlWynik(parametr){
                 let wzrost = (wyniki[parametr - 1][1]);
                 let waga = (wyniki[parametr - 1][2]);
                 let BMI = (wyniki[parametr - 1][3]);
-                czysc_pola();
+                document.querySelector('.wzrost').value="";
+                document.querySelector('.waga').value="";
                 gaugeData.setValue(0, 0, BMI);
                 gauge.draw(gaugeData, gaugeOptions);
-                document.getElementById("komunikat_1").innerHTML = "Wzrost: " + wzrost + "cm Waga: " + waga + "kg";
-                document.getElementById("komunikat_2").innerHTML = "BMI " + formatuj_liczbe(BMI);
-                document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + formatuj_liczbe(srednia());
-                document.getElementById("komunikat_2").style.color = 'rgb(255, 255, 170)';
+                document.querySelector(".komunikat_1").innerHTML = "Wzrost: " + wzrost + "cm Waga: " + waga + "kg";
+                document.querySelector(".komunikat_2").innerHTML = "BMI " + formatujLiczbe(BMI);
+                document.querySelector(".srednia").innerHTML = "Średnia wszystkich wyników: " + formatujLiczbe(srednia());
+                document.querySelector(".komunikat_2").style.color = 'rgb(255, 255, 170)';
 
                     if (BMI <18.5) {
-                        document.getElementById("stan").innerHTML = "niedowaga";
-                        document.getElementById("stan").style.color = 'rgb(0, 0, 255)';}
+                        document.querySelector(".stan").innerHTML = "niedowaga";
+                        document.querySelector(".stan").style.color = 'rgb(0, 0, 255)';}
                     if ((BMI >=18.5) && (BMI < 25)) {
-                        document.getElementById("stan").innerHTML = "waga optymalna";
-                        document.getElementById("stan").style.color = 'rgb(25, 248, 25)';}
+                        document.querySelector(".stan").innerHTML = "waga optymalna";
+                        document.querySelector(".stan").style.color = 'rgb(25, 248, 25)';}
                     if ((BMI >=25) && (BMI < 30)) {
-                        document.getElementById("stan").innerHTML = "nadwaga";
-                        document.getElementById("stan").style.color = 'rgb(255, 175, 101)';}
+                        document.querySelector(".stan").innerHTML = "nadwaga";
+                        document.querySelector(".stan").style.color = 'rgb(255, 175, 101)';}
                     if (BMI >30) {
-                        document.getElementById("stan").innerHTML = "otyłość :-) niestety";
-                        document.getElementById("stan").style.color = 'rgb(255, 150, 150)';} 
+                        document.querySelector(".stan").innerHTML = "otyłość :-) niestety";
+                        document.querySelector(".stan").style.color = 'rgb(255, 150, 150)';} 
                         
                     if (wyniki.length > 1) {
                         let a = (wyniki[(wyniki.length) - 2][3]); 
                         let b = (wyniki[(wyniki.length) - 1][3]);
-                        document.getElementById("komunikat_3").innerHTML = ""
-                        if (a > b) {document.getElementById("komunikat_3").innerHTML = "Twoje BMI spadło!"};
-                        if (a < b) {document.getElementById("komunikat_3").innerHTML = "Twoje BMI wzrosło!"};};
+                        document.querySelector(".komunikat_3").innerHTML = ""
+                        if (a > b) {document.querySelector(".komunikat_3").innerHTML = "Twoje BMI spadło!"};
+                        if (a < b) {document.querySelector(".komunikat_3").innerHTML = "Twoje BMI wzrosło!"};};
             };
         
             function wpisArchiwum(nowy_tekst, nowy_wzrost, nowa_waga, nowe_BMI){
                 let nowyWpisArchiwum = document.createElement("div");
                 nowyWpisArchiwum.name = wyniki.length;
                 nowyWpisArchiwum.addEventListener("click", click, false);
-                nowyWpisArchiwum.innerHTML = nowy_tekst +" "+nowy_wzrost+"-"+nowa_waga+" "+ formatuj_liczbe(nowe_BMI);
+                nowyWpisArchiwum.innerHTML = nowy_tekst +" "+nowy_wzrost+"-"+nowa_waga+" "+ formatujLiczbe(nowe_BMI);
                 document.querySelector(".wpisyWynikow").appendChild(nowyWpisArchiwum);
             };
 
@@ -179,59 +204,25 @@
                 return srednia;
             };
 
-            function zeruj_ustawienia(){
+            function zerujUstawienia(){
                     BMI = 0;
                     gaugeData.setValue(0, 0, 0);
                     gauge.draw(gaugeData, gaugeOptions);
-                    document.getElementById("komunikat_2").innerHTML = "";
-                    document.getElementById("stan").innerHTML = "";
-                    document.getElementById("komunikat_3").innerHTML = "";
+                    document.querySelector(".komunikat_2").innerHTML = "";
+                    document.querySelector(".stan").innerHTML = "";
+                    document.querySelector(".komunikat_3").innerHTML = "";
             };
             
-            function czysc_pola(){
-                document.getElementById('wzrost').value="";
-                document.getElementById('waga').value="";
-            };
-
-            function wyczysc_wyniki(){
-                
-                let div = document.getElementsByClassName("wpisyWynikow"), child;
-                while ((child = div[0].firstChild)) {
-                div[0].removeChild(child);
-                };
-
-                document.getElementById("komunikat_1").innerHTML = "";
-                document.getElementById("komunikat_2").innerHTML = "";
-                document.getElementById("stan").innerHTML = "";
-                document.getElementById("komunikat_3").innerHTML = "";
-                gaugeData.setValue(0, 0, 0);
-                gauge.draw(gaugeData, gaugeOptions);
-                document.getElementById('srednia').innerHTML = "Średnia wszystkich wyników:";
-                
-                wyniki.length = 0;
-                localStorage.clear();
-            };
-
-            function ustaw_zegar(){
-                    gaugeData = new google.visualization.DataTable();
-                    gaugeData = new google.visualization.DataTable();
-                    gaugeData.addColumn('number', 'BMI');
-                    gaugeData.addRows(2);
-                    gaugeData.setCell(0, 0, 0);
-                    gauge = new google.visualization.Gauge(document.getElementById('chart_div'));
-                    gauge.draw(gaugeData, gaugeOptions);
-            };
-
-            function formatuj_liczbe(liczba){
-                let liczba_sformatowana = (parseFloat(liczba)).toLocaleString('pl-PL',{ 
+            function formatujLiczbe(liczba){
+                let liczbaSformatowana = (parseFloat(liczba)).toLocaleString('pl-PL',{ 
                     useGrouping:'true',
                     minimumFractionDigits: (0),
                     maximumFractionDigits: (2),
                 });
-            return liczba_sformatowana;
+            return liczbaSformatowana;
             };
 
-            function zaladuj_dane() {
+            window.onload = function () {
                 let get_storage_data = localStorage.getItem("data");
                 let get_storage_wzrost = localStorage.getItem("wzrost");
                 let get_storage_waga = localStorage.getItem("waga");
@@ -249,11 +240,9 @@
                         wpisArchiwum((wyniki[wyniki.length - 1][0]), (wyniki[wyniki.length - 1][1]), 
                                         (wyniki[wyniki.length - 1][2]),(wyniki[wyniki.length - 1][3]));
                     }
-                    document.getElementById("srednia").innerHTML = "Średnia wszystkich wyników: " + formatuj_liczbe(srednia());
+                    document.querySelector(".srednia").innerHTML = "Średnia wszystkich wyników: " + formatujLiczbe(srednia());
                 }
             };
-
-
         </script>
     </body>
 </html>
