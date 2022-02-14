@@ -63,8 +63,8 @@
             gauge.draw(gaugeData, gaugeOptions);
         });
       
-        let liczba_1 = document.querySelector('.wzrost');
-        let liczba_2 = document.querySelector('.waga');
+        let wzrost = document.querySelector('.wzrost');
+        let waga = document.querySelector('.waga');
         let wyniki = [];
       
         let gaugeOptions = {
@@ -82,46 +82,45 @@
 
         let wyliczWynik = document.querySelector(".wyliczWynik");
             wyliczWynik.addEventListener("click", function () {
-                let PierwszaLiczba = parseFloat((liczba_1.value).replace(',', '.'));
-                let DrugaLiczba = parseFloat((liczba_2.value).replace(',', '.'));
+                let wzrostLiczba = parseFloat((wzrost.value).replace(',', '.'));
+                let wagaLiczba = parseFloat((waga.value).replace(',', '.'));
                 let BMI = 0;
-                    if ((isNaN(PierwszaLiczba) == true) || (isNaN(DrugaLiczba) == true)) {
+                const czasPomiaru = new Date();
+                    
+                    if ((isNaN(wzrostLiczba) == true) || (isNaN(wagaLiczba) == true)) {
                         document.querySelector(".komunikat_1").innerHTML = "podaj poprawne dane!";
                         zerujUstawienia();
                     }
-                    else if ((PierwszaLiczba < 120) || (PierwszaLiczba >240)) {
+                    else if ((wzrostLiczba < 120) || (wzrostLiczba >240)) {
                         document.querySelector(".komunikat_1").innerHTML = "wzrost nie jest poprawny!";
                         zerujUstawienia();
                     }   
-                    else if ((DrugaLiczba < 40) || (DrugaLiczba >200)) {
+                    else if ((wagaLiczba < 40) || (wagaLiczba >200)) {
                         document.querySelector(".komunikat_1").innerHTML = "waga nie jest poprawna!";
                         zerujUstawienia();
                     }
                     else {
-                        BMI = (DrugaLiczba / ((PierwszaLiczba/100) * (PierwszaLiczba/100))).toFixed(2);
+                        BMI = (wagaLiczba / ((wzrostLiczba/100) * (wzrostLiczba/100))).toFixed(2);
                         gaugeData.setValue(0, 0, BMI);
                         gauge.draw(gaugeData, gaugeOptions);
-                        
-                        const data = new Date();
-                        wyniki.push(["Pomiar#" + (wyniki.length + 1) + " z " + data.getFullYear() + "." 
-                            + (data.getMonth() + 1) + "." + data.getDate() + "-" + data.getHours() + ":" 
-                            + data.getMinutes() + ":" + data.getSeconds(), Math.round(PierwszaLiczba), Math.round(DrugaLiczba), BMI]);
+                        wyniki.push(["Pomiar#" + (wyniki.length + 1) + " z " + (czasPomiaru.toLocaleString()).replace(',',''), 
+                            wzrostLiczba, wagaLiczba, parseFloat(BMI)]);
         
-                        let storage_data = [];
-                        let storage_wzrost = [];        
-                        let storage_waga = [];
-                        let storage_wynik = [];
+                        let putStorage_czas = [];
+                        let putStorage_wzrost = [];        
+                        let putStorage_waga = [];
+                        let putStorage_wynik = [];
                         
                         for (i=0; i < wyniki.length; i++){
-                            storage_data.push(wyniki[i][0]);
-                            storage_wzrost.push(wyniki[i][1]);
-                            storage_waga.push(wyniki[i][2]);
-                            storage_wynik.push(wyniki[i][3]);
+                            putStorage_czas.push(wyniki[i][0]);
+                            putStorage_wzrost.push(wyniki[i][1]);
+                            putStorage_waga.push(wyniki[i][2]);
+                            putStorage_wynik.push(wyniki[i][3]);
                         }
-                            localStorage.setItem("data", storage_data);
-                            localStorage.setItem("wzrost", storage_wzrost);
-                            localStorage.setItem("waga", storage_waga);
-                            localStorage.setItem("wynik", storage_wynik);
+                            localStorage.setItem("czas", putStorage_czas);
+                            localStorage.setItem("wzrost", putStorage_wzrost);
+                            localStorage.setItem("waga", putStorage_waga);
+                            localStorage.setItem("wynik", putStorage_wynik);
                         
                         wpisArchiwum((wyniki[wyniki.length - 1][0]), (wyniki[wyniki.length - 1][1]), 
                                         (wyniki[wyniki.length - 1][2]),(wyniki[wyniki.length - 1][3]));
@@ -130,7 +129,7 @@
                     };    
             });
 
-            let click = function (wybor){
+            let clickMouse = function (wybor){
             let mojWybor = wybor.target.name; 
             wyswietlWynik(mojWybor);
             document.querySelector(".komunikat_3").innerHTML = "Pomiar#" + mojWybor + " z archiwum";
@@ -161,7 +160,7 @@
                 document.querySelector('.waga').value="";
                 gaugeData.setValue(0, 0, BMI);
                 gauge.draw(gaugeData, gaugeOptions);
-                document.querySelector(".komunikat_1").innerHTML = "Wzrost: " + wzrost + "cm Waga: " + waga + "kg";
+                document.querySelector(".komunikat_1").innerHTML = "Wzrost: " + formatujLiczbe(wzrost) + "cm Waga: " + formatujLiczbe(waga) + "kg";
                 document.querySelector(".komunikat_2").innerHTML = "BMI " + formatujLiczbe(BMI);
                 document.querySelector(".srednia").innerHTML = "Średnia wszystkich wyników: " + formatujLiczbe(srednia());
                 document.querySelector(".komunikat_2").style.color = 'rgb(255, 255, 170)';
@@ -187,11 +186,12 @@
                         if (a < b) {document.querySelector(".komunikat_3").innerHTML = "Twoje BMI wzrosło!"};};
             };
         
-            function wpisArchiwum(nowy_tekst, nowy_wzrost, nowa_waga, nowe_BMI){
+            function wpisArchiwum(wpisCzas, wpisWzrost, wpisWaga, wpisBMI){
                 let nowyWpisArchiwum = document.createElement("div");
                 nowyWpisArchiwum.name = wyniki.length;
-                nowyWpisArchiwum.addEventListener("click", click, false);
-                nowyWpisArchiwum.innerHTML = nowy_tekst +" "+nowy_wzrost+"-"+nowa_waga+" "+ formatujLiczbe(nowe_BMI);
+                nowyWpisArchiwum.addEventListener("click", clickMouse, false);
+                nowyWpisArchiwum.innerHTML = wpisCzas +" (" + formatujLiczbe(wpisWzrost) + "-" + 
+                    formatujLiczbe(wpisWaga) + ") " + formatujLiczbe(wpisBMI);
                 document.querySelector(".wpisyWynikow").appendChild(nowyWpisArchiwum);
             };
 
@@ -200,7 +200,7 @@
                 let srednia = 0;
                 for (i=0; i<(wyniki.length); i++) {
                     suma = suma + parseFloat(wyniki[i][3]);
-                    srednia = (suma / (wyniki.length)).toFixed(2);}
+                    srednia = (suma / (wyniki.length));}
                 return srednia;
             };
 
@@ -222,27 +222,27 @@
             return liczbaSformatowana;
             };
 
-            window.onload = function () {
-                let get_storage_data = localStorage.getItem("data");
-                let get_storage_wzrost = localStorage.getItem("wzrost");
-                let get_storage_waga = localStorage.getItem("waga");
-                let get_storage_wynik = localStorage.getItem("wynik");
+            window.addEventListener("load", function () {
+                let getStorage_czas = localStorage.getItem("czas");
+                let getStorage_wzrost = localStorage.getItem("wzrost");
+                let getStorage_waga = localStorage.getItem("waga");
+                let getStorage_wynik = localStorage.getItem("wynik");
 
-                if (get_storage_data === null) {
+                if (getStorage_czas === null) {
                     return;}
                 else {
-                    get_storage_data = localStorage.getItem("data").split(",");
-                    get_storage_wzrost = localStorage.getItem("wzrost").split(",");
-                    get_storage_waga = localStorage.getItem("waga").split(",");
-                    get_storage_wynik = localStorage.getItem("wynik").split(",");                    
-                    for (i=0; i < get_storage_data.length; i++) {
-                        wyniki.push([get_storage_data[i], get_storage_wzrost[i], get_storage_waga[i], get_storage_wynik[i]]);
+                    getStorage_czas = localStorage.getItem("czas").split(",");
+                    getStorage_wzrost = localStorage.getItem("wzrost").split(",");
+                    getStorage_waga = localStorage.getItem("waga").split(",");
+                    getStorage_wynik = localStorage.getItem("wynik").split(",");                    
+                    for (i=0; i < getStorage_czas.length; i++) {
+                        wyniki.push([getStorage_czas[i], getStorage_wzrost[i], getStorage_waga[i], getStorage_wynik[i]]);
                         wpisArchiwum((wyniki[wyniki.length - 1][0]), (wyniki[wyniki.length - 1][1]), 
                                         (wyniki[wyniki.length - 1][2]),(wyniki[wyniki.length - 1][3]));
                     }
                     document.querySelector(".srednia").innerHTML = "Średnia wszystkich wyników: " + formatujLiczbe(srednia());
                 }
-            };
+            });
         </script>
     </body>
 </html>
