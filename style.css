@@ -1,5 +1,7 @@
 body {
-    background-color: cadetblue;}
+    background-color: cadetblue;
+    min-width: 1200px;
+    width:auto;}
 
 h1{
     margin: 20px;
@@ -10,11 +12,11 @@ section {
     display: flex;}
 
 #panel-boczny {
-    font-size: 15px;
+    font-size: 14px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color: lightyellow;
     margin: 10px;
-    padding: 16px;
+    padding: 15px;
     border: solid lightskyblue 1px;
     border-radius: 15px;}
 
@@ -23,7 +25,7 @@ section {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color: white;
     margin: 10px;
-    padding: 16px;
+    padding: 15px;
     border: double lightskyblue 4px;
     border-radius: 15px;}
 
@@ -38,3 +40,16 @@ section {
     margin: 4px;
     border: solid 1px;
     border-radius: 15px;}
+
+.wyniki-ng {
+    font-size: 14px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    color: lightyellow;
+    margin: 10px;
+}
+
+#wyniki-op {
+    text-align: center;
+    color: lightgoldenrodyellow;
+}
