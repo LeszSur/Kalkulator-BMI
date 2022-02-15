@@ -58,7 +58,6 @@
         google.charts.load('current', {'packages':['gauge'], 'language': 'pl'});
         google.charts.setOnLoadCallback(function (){
             gaugeData = new google.visualization.DataTable();
-            gaugeData = new google.visualization.DataTable();
             gaugeData.addColumn('number', 'BMI');
             gaugeData.addRows(2);
             gaugeData.setCell(0, 0, 0);
@@ -73,7 +72,7 @@
         let gaugeOptions = {
             min: 14,
             max: 34,
-            width: 360, height: 360,
+            width: 350, height: 350,
             greenFrom: 18.5, greenTo: 24.99,
             yellowFrom:25, yellowTo: 29.99,
             redFrom: 30, redTo: 45,
