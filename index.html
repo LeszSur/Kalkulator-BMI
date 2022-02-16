@@ -134,7 +134,7 @@
             let clickMouse = function (wybor){
             let mojWybor = wybor.target.name; 
             wyswietlWynik(mojWybor);
-            document.querySelector(".wyniki-ng").innerHTML = "Pomiar #" + mojWybor + " z Archiwum";
+            document.querySelector(".wyniki-ng").innerHTML = wyniki[mojWybor-1][0];
             };
 
             let usunWyniki = document.querySelector(".usunWyniki");
